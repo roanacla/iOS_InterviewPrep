@@ -2,25 +2,32 @@ import SwiftUI
 
 struct NetworkingView: View {
     let concept: Concept
-    let song: Song
+    var viewModel = NetworkingViewModel(songDownloader: .init())
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            
             VStack(alignment: .center) {
-                Image(uiImage: artworkImage)
+                Image(uiImage: viewModel.artwork)
                   .resizable()
                   .aspectRatio(contentMode: .fit)
-                  .frame(width: 200, height: 200)
+                  .frame(width: 100, height: 100)
                   .shadow(radius: 10)
-                
-                Text("Networking")
-                    .font(.title2)
-                    .bold()
+                if let artistName = viewModel.song?.artistName {
+                    Text(artistName)
+                        .font(.caption)
+                        .bold()
+                }
+                if let trackName = viewModel.song?.trackName {
+                    Text(trackName)
+                        .font(.caption)
+                }
             }
         }
         .padding()
         .navigationTitle(concept.title)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.downloadSong()
+        }
     }
 }
 
