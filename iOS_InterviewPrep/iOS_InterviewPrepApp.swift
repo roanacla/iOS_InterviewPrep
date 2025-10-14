@@ -25,7 +25,7 @@ struct iOS_InterviewPrepApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ConceptsView()
         }
         .modelContainer(sharedModelContainer)
     }
