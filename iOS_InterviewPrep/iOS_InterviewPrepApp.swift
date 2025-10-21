@@ -25,7 +25,7 @@ struct iOS_InterviewPrepApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ConceptsView()
+            ConceptsView(viewModel: .init(), networkingViewModel: .init(songDownloader: .init()))
         }
         .modelContainer(sharedModelContainer)
     }

@@ -23,14 +23,14 @@ class SongDownloader {
     }
     
     func downloadArtwork(for url: URL) async throws -> Data {
-        let (data, response) = try await session.download(from: url)
+        let (data, response) = try await session.data(from: url)
         
         guard (response as? HTTPURLResponse)?.statusCode == 200 else {
             throw SongDownloaderError.invalidResponse
         }
         
         do {
-            return try Data(contentsOf: data)
+            return try data
         } catch {
             throw SongDownloaderError.dataConversionError
         }

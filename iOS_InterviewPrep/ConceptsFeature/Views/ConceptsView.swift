@@ -2,7 +2,8 @@ import SwiftUI
 
 // Create a simple view in Swift named Concepts
 struct ConceptsView: View {
-    var viewModel =  ConceptsViewModel()
+    let viewModel: ConceptsViewModel
+    let networkingViewModel: NetworkingViewModel
     
     var body : some View {
         NavigationStack {
@@ -21,8 +22,10 @@ struct ConceptsView: View {
             .navigationTitle("Concepts")
             .navigationDestination(for: Concept.self) { concept in
                 switch concept.subject {
-                case .networking:
-                    NetworkingView(concept: concept)
+//                case .networking:
+//                    NetworkingView(concept: concept, viewModel: networkingViewModel)
+                case .conectedFour:
+                    ConectedFourView()
                 default:
                     Text("Empty")
                 }
@@ -34,6 +37,6 @@ struct ConceptsView: View {
 //Preview
 struct Concepts_Previews: PreviewProvider {
     static var previews: some View {
-        ConceptsView()
+        ConceptsView(viewModel: .init(), networkingViewModel: .init(songDownloader: .init()))
     }
 }

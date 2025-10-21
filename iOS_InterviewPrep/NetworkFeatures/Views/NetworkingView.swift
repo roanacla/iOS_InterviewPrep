@@ -2,7 +2,8 @@ import SwiftUI
 
 struct NetworkingView: View {
     let concept: Concept
-    var viewModel = NetworkingViewModel(songDownloader: .init())
+    let viewModel: NetworkingViewModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .center) {
@@ -34,6 +35,6 @@ struct NetworkingView: View {
 struct NetworkingView_Previews: PreviewProvider {
     static var previews: some View {
         let concept: Concept = .init(title: "Networking", description: "Fetching and sending data from and to a server", subject: .networking)
-        NetworkingView(concept: concept)
+        NetworkingView(concept: concept, viewModel: NetworkingViewModel(songDownloader: .init()))
     }
 }
