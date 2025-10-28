@@ -22,10 +22,10 @@ struct ConceptsView: View {
             .navigationTitle("Concepts")
             .navigationDestination(for: Concept.self) { concept in
                 switch concept.subject {
-//                case .networking:
-//                    NetworkingView(concept: concept, viewModel: networkingViewModel)
                 case .conectedFour:
                     ConectedFourView()
+                case .searchMovies:
+                    MovieSearchView(viewModel: SearchViewModel())
                 default:
                     Text("Empty")
                 }

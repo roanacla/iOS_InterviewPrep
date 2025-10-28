@@ -25,8 +25,13 @@ class ConceptsViewModel {
                 subject: .groupCalls),
         Concept(title: "Networking",
                 description: "Fetching and sending data from and to a server.",
-                subject: .networking)
-        
+                subject: .networking),
+        Concept(title: "Async Dictionary",
+                description: "Fetching and sending data from and to a server.",
+                subject: .networking),
+        Concept(title: "Movie Search",
+                description: "Searching movies from a server.",
+                subject: .searchMovies)
         ]
 }
 
@@ -36,6 +41,7 @@ enum Subject {
     case networking
     case groupCalls
     case conectedFour
+    case searchMovies
 }
 
 struct Concept: Identifiable, Hashable {
