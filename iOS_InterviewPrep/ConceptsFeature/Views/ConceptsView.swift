@@ -26,6 +26,8 @@ struct ConceptsView: View {
                     ConectedFourView()
                 case .searchMovies:
                     MovieSearchView(viewModel: SearchViewModel())
+                case .metMuseum:
+                    MetObjectsView(objectsViewModel: ObjectsViewModel(networkService: MetNetworkService()))
                 default:
                     Text("Empty")
                 }
