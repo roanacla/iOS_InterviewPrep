@@ -18,10 +18,12 @@ struct MetObjectsView: View {
                         Spacer()
                         if let url = URL(string: metObject.primaryImageSmall) {
                             AsyncImage(url: url) { image in
-                                image.image?
+                                image
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 70)
+                            } placeholder: {
+                                ProgressView()
                             }
                         } else {
                             ProgressView()
