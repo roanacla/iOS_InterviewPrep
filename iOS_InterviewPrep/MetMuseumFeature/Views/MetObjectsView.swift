@@ -5,19 +5,26 @@ struct MetObjectsView: View {
     @State var objectsViewModel: ObjectsViewModel
     
     var body: some View {
-        List(objectsViewModel.metObjects) { metObject in
+        List($objectsViewModel.metObjects) { $metObject in
             VStack {
                 NavigationLink {
-                    Text(metObject.title)
+                    MetObjectsDetailView(metObject: $metObject)
                 } label: {
                     HStack {
-                        Text(metObject.title)
+                        VStack {
+                            Text(metObject.title)
+                            Text(metObject.isFavorite ? "★" : "☆")
+                        }
                         Spacer()
-                        AsyncImage(url: URL(string: metObject.primaryImageSmall)) { image in
-                            image.image?
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 70)
+                        if let url = URL(string: metObject.primaryImageSmall) {
+                            AsyncImage(url: url) { image in
+                                image.image?
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 50, height: 70)
+                            }
+                        } else {
+                            ProgressView()
                         }
                     }
                 }
@@ -46,7 +53,9 @@ struct MetObjectsView: View {
             }
         }
         .task {
-            await objectsViewModel.searchObjects()
+            if !objectsViewModel.firstLoadReady {
+                await objectsViewModel.searchObjects()
+            }
         }
     }
 }

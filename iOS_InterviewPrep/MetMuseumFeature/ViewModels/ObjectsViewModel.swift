@@ -9,6 +9,7 @@ class ObjectsViewModel {
     var alertMessage = "Something went wrong"
     var searchQuery = ""
     var limit = 10
+    var firstLoadReady = false
     
     init(networkService: MetNetworkService) {
         self.networkService = networkService
@@ -16,7 +17,7 @@ class ObjectsViewModel {
     
     func searchObjects() async {
         do {
-            let searchResult = try await networkService.fetchObjects(query: searchQuery.isEmpty ? "cat" : searchQuery)
+            let searchResult = try await networkService.fetchObjects(query: searchQuery.isEmpty ? "roge" : searchQuery)
             
             var fetchObjects: [(Int, MetObject)] = []
             
@@ -34,7 +35,9 @@ class ObjectsViewModel {
             }
             
             metObjects = fetchObjects.sorted { $0.0 < $1.0 }.map { $0.1 }
+            firstLoadReady = true
         } catch {
+            firstLoadReady = false
             isErrorPresented = true
             metObjects = []
             
