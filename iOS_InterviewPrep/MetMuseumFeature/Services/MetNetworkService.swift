@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 enum MetSearchError: Error {
     case invalidURL
@@ -47,5 +48,24 @@ class MetNetworkService {
         
         let decoder = JSONDecoder()
         return try decoder.decode(MetObject.self, from: data)
+    }
+    
+    func fetchObjectImage(endpoint: String) async throws -> UIImage? {
+        let imageEndPoint = endpoint
+        
+        let imageURL = URL(string: imageEndPoint)
+        guard let imageURL else {
+            throw MetSearchError.invalidURL
+        }
+        let request = URLRequest(url: imageURL)
+        let urlSession = URLSession.shared
+        
+        let (data, response) = try await urlSession.data(for: request)
+        
+        guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
+            throw MetSearchError.invalidResponse
+        }
+        
+        return UIImage(data: data)
     }
 }

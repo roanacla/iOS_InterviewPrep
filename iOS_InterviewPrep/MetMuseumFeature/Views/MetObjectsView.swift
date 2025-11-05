@@ -8,25 +8,33 @@ struct MetObjectsView: View {
         List($objectsViewModel.metObjects) { $metObject in
             VStack {
                 NavigationLink {
-                    MetObjectsDetailView(metObject: $metObject)
+                    MetObjectsDetailView(viewModel: .init(metObject: metObject, cache: objectsViewModel.nsCache), metObject: $metObject)
                 } label: {
                     HStack {
-                        VStack {
+                        VStack(alignment: .leading) {
                             Text(metObject.title)
+                            Spacer()
                             Text(metObject.isFavorite ? "★" : "☆")
                         }
                         Spacer()
-                        if let url = URL(string: metObject.primaryImageSmall) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 70)
-                            } placeholder: {
-                                ProgressView()
-                            }
+                        if let cacheImage = objectsViewModel.nsCache.object(forKey: NSNumber(value: metObject.objectID)) {
+                            Image(uiImage: cacheImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 50, height: 70)
                         } else {
-                            ProgressView()
+                            AsyncImage(url: URL(string: metObject.primaryImageSmall)) { phase in
+                                if let image = phase.image {
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 50, height: 70)// Displays the loaded image.
+                                } else if phase.error != nil {
+                                    Color.red // Indicates an error.
+                                } else {
+                                    Color.blue // Acts as a placeholder.
+                                }
+                            }
                         }
                     }
                 }

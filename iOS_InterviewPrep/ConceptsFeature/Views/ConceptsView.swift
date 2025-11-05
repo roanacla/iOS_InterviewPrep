@@ -3,7 +3,6 @@ import SwiftUI
 // Create a simple view in Swift named Concepts
 struct ConceptsView: View {
     let viewModel: ConceptsViewModel
-    let networkingViewModel: NetworkingViewModel
     
     var body : some View {
         NavigationStack {
@@ -39,6 +38,6 @@ struct ConceptsView: View {
 //Preview
 struct Concepts_Previews: PreviewProvider {
     static var previews: some View {
-        ConceptsView(viewModel: .init(), networkingViewModel: .init(songDownloader: .init()))
+        ConceptsView(viewModel: .init())
     }
 }

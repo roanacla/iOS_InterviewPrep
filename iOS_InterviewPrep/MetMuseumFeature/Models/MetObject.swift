@@ -14,7 +14,6 @@ struct MetObject: Identifiable, Codable {
         self.title = title
         self.primaryImage = primaryImage
         self.primaryImageSmall = primaryImageSmall
-//        self.isFavorite = false
     }
     
     // MARK: - Codable
