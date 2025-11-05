@@ -8,7 +8,7 @@ struct MetObjectsView: View {
         List($objectsViewModel.metObjects) { $metObject in
             VStack {
                 NavigationLink {
-                    MetObjectsDetailView(viewModel: .init(metObject: metObject, cache: objectsViewModel.nsCache), metObject: $metObject)
+                    MetObjectsDetailView(metObject: $metObject)
                 } label: {
                     HStack {
                         VStack(alignment: .leading) {

@@ -5,11 +5,9 @@ import UIKit
 @MainActor
 public class MetObjectDetailViewModel {
     var metObject: MetObject
-    var nsCache: NSCache<NSNumber, UIImage>
     
-    init(metObject: MetObject, cache: NSCache<NSNumber, UIImage>) {
+    init(metObject: MetObject) {
         self.metObject = metObject
-        self.nsCache = cache
     }
     
     func toggleFavorite() {
