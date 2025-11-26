@@ -34,7 +34,10 @@ class ConceptsViewModel {
                 subject: .searchMovies),
         Concept(title: "Museum Search",
                 description: "Searching objects from the MetMuseum from a server.",
-                subject: .metMuseum)
+                subject: .metMuseum),
+        Concept(title: "Music Catalog",
+                description: "Search over a catalog of artists and albums",
+                subject: .musicCatalog )
         ]
 }
 
@@ -46,6 +49,7 @@ enum Subject {
     case conectedFour
     case searchMovies
     case metMuseum
+    case musicCatalog
 }
 
 struct Concept: Identifiable, Hashable {
