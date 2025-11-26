@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import os
 
 @MainActor
 @Observable
@@ -12,7 +13,7 @@ class ObjectsViewModel {
     var limit = 10
     var firstLoadReady = false
     var nsCache: NSCache<NSNumber, UIImage> = .init()
-    
+    let logger = Logger(subsystem: "com.roger.contactsapp", category: "ContactFetch")
     init(networkService: MetNetworkService) {
         self.networkService = networkService
     }
@@ -30,6 +31,7 @@ class ObjectsViewModel {
             
             try await withThrowingTaskGroup(of: (Int, MetObject)?.self) { group in
                 for (id, value) in searchResult.objectIDs.prefix(limit).enumerated() {
+                    Log.metFeature.info("Be careful")
                     group.addTask { [weak self, nsCache] in
                         guard let self else { return nil }
                         let metObject = try await self.fetchObject(id: value)

@@ -22,6 +22,7 @@ struct MetObjectsView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 50, height: 70)
+                                .fixedSize()
                         } else {
                             AsyncImage(url: URL(string: metObject.primaryImageSmall)) { phase in
                                 if let image = phase.image {
@@ -29,6 +30,7 @@ struct MetObjectsView: View {
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 50, height: 70)// Displays the loaded image.
+                                        .fixedSize()
                                 } else if phase.error != nil {
                                     Color.red // Indicates an error.
                                 } else {

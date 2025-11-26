@@ -1,40 +1,149 @@
 import SwiftUI
 
+// Helper for cell state colors, remains the same
+extension CellState {
+    var color: Color {
+        switch self {
+        case .empty: return .clear
+        case .playerOne: return .red
+        case .playerTwo: return .yellow
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .empty: return "Empty"
+        case .playerOne: return "Player 1 (Red)"
+        case .playerTwo: return "Player 2 (Yellow)"
+        }
+    }
+}
+
 struct ConectedFourView: View {
     @State var viewModel: ConectedFourViewModel = .init()
+
+    // Constants for cell sizing and spacing
+    private let cellSize: CGFloat = 50
+    private let spacing: CGFloat = 8
+
     var body: some View {
-        Text(viewModel.winner != nil ? "Winner: \(viewModel.winner!)" : "Connected Four")
-            .font(.title)
-        Spacer()
-        Text(viewModel.boardVisualRepresentation)
-            .monospaced()
-        HStack(spacing: 20) {
-            Button("Col 1") {
-                viewModel.dropDisk(in: 0)
+        VStack {
+            // MARK: Game Status Display
+            Text(viewModel.winner != nil ? "Winner: \(viewModel.winner?.description ?? "Unknown")!" : "Current Turn: \(viewModel.currentPlayer.description)")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding()
+                .foregroundColor(viewModel.winner?.color ?? .primary) // Use color from CellState extension
+                .animation(.easeInOut, value: viewModel.winner)
+            
+            Spacer()
+
+            // MARK: The Game Board Display (now tappable)
+            ZStack {
+                // The main board frame/background
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.blue) // Classic blue Connect Four board color
+                    .frame(width: CGFloat(viewModel.boardModel.columns) * (cellSize + spacing) + spacing,
+                           height: CGFloat(viewModel.boardModel.rows) * (cellSize + spacing) + spacing)
+                    .shadow(radius: 8, x: 0, y: 5) // Deeper shadow for the board itself
+                    .contentShape(Rectangle())
+                    .gesture(
+                        SpatialTapGesture()
+                            .onEnded { event in
+                                let columnSlotWidth = cellSize + spacing
+                                let adjustedX = event.location.x - spacing
+                                let tappedColumn = Int(adjustedX / columnSlotWidth)
+                                
+                                if tappedColumn >= 0 && tappedColumn < viewModel.boardModel.columns && !viewModel.isWinner {
+                                    viewModel.dropDisk(in: tappedColumn)
+                                }
+                            }
+                    )
+
+                // Grid of pieces and 'holes' - these are visual elements rendered on top of the background
+                VStack(spacing: spacing) {
+                    ForEach(0..<viewModel.boardModel.rows, id: \.self) { row in
+                        HStack(spacing: spacing) {
+                            ForEach(0..<viewModel.boardModel.columns, id: \.self) { column in
+                                CellView(cellState: viewModel.boardModel.board[row][column],
+                                         row: row, // Pass row for animation calculation
+                                         cellSize: cellSize)
+                            }
+                        }
+                    }
+                }
             }
-            Button("Col 2") {
-                viewModel.dropDisk(in: 1)
-            }
-            Button("Col 3") {
-                viewModel.dropDisk(in: 2)
-            }
-            Button("Col 4") {
-                viewModel.dropDisk(in: 3)
-            }
-            Button("Col 5") {
-                viewModel.dropDisk(in: 4)
-            }
-            Button("Col 6") {
-                viewModel.dropDisk(in: 5)
-            }
-            Button("Col 7") {
-                viewModel.dropDisk(in: 6)
-            }
-        }
-        Spacer()
-        HStack {
+            .animation(.easeOut(duration: 0.4), value: viewModel.boardModel.board) // Animate changes to the board
+            .padding(.horizontal)
+            .padding(.vertical, 10)
+
+            Spacer()
+
+            // MARK: Reset Game Button
             Button("Reset Game") {
                 viewModel.resetGame()
+            }
+            .font(.title3)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 20)
+            .background(Color.green)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .shadow(radius: 3)
+            .padding(.bottom)
+        }
+        .padding()
+    }
+
+    // MARK: - Nested CellView for individual board cells and animation
+    struct CellView: View {
+        let cellState: CellState
+        let row: Int // Used to calculate the initial drop height
+        let cellSize: CGFloat
+        
+        // State for managing the disk's vertical offset during animation
+        @State private var dropYOffset: CGFloat = -100 // Start high above the cell
+        @State private var opacity: Double = 0.0 // Start invisible
+
+        var body: some View {
+            ZStack {
+                // The 'hole' appearance
+                Circle()
+                    .fill(Color.gray.opacity(0.4)) // Slightly darker for more depth
+                    .frame(width: cellSize, height: cellSize)
+                    .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 2) // Inner shadow effect for the hole
+                    .overlay(
+                        Circle()
+                            .stroke(Color.black.opacity(0.2), lineWidth: 1) // Outline for more definition
+                    )
+
+                // The actual player piece, visible only if the cell is not empty
+                if cellState != .empty {
+                    Circle()
+                        .fill(cellState.color)
+                        .frame(width: cellSize, height: cellSize)
+                        .shadow(color: .black.opacity(0.4), radius: 3, x: 2, y: 2) // Shadow for the disk
+                        .offset(y: dropYOffset) // Apply the animated offset
+                        .opacity(opacity) // Apply opacity for fade-in
+                        .onAppear {
+                            // Calculate a realistic drop start position based on the row
+                            // This makes higher rows fall shorter distances
+                            let initialFallDistance = -CGFloat(row) * (cellSize + 8) - cellSize // 8 is the spacing
+                            
+                            // Initialize off-screen and invisible
+                            dropYOffset = initialFallDistance
+                            opacity = 0.0
+
+                            // Animate to landing position with a spring effect
+                            // The spring parameters (response, dampingFraction) control the bounce
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0.2)) {
+                                dropYOffset = 0 // Land at its final position
+                                opacity = 1.0 // Become fully visible
+                            }
+                        }
+                        // Reset animation state when piece changes (e.g., on reset game)
+                        .id(cellState) // Ensure onAppear is re-triggered if state changes (e.g., reset)
+                }
             }
         }
     }
@@ -42,142 +151,4 @@ struct ConectedFourView: View {
 
 #Preview {
     ConectedFourView(viewModel: .init())
-}
-
-enum Player {
-    case player1
-    case player2
-}
-
-@Observable
-class ConectedFourViewModel {
-    var boardModel = BoardModel()
-    var boardVisualRepresentation: String = ""
-    var currentPlayer: Player = .player1
-    var isWinner: Bool = false
-    var winner: Player? = nil
-    
-    init() {
-        printBoard()
-    }
-    
-    func dropDisk(in column: Int) {
-        var result: (row: Int, column: Int) = (0, 0)
-        if boardModel.dropPiece(column: column, mark: currentPlayer == .player1 ? 1 : -1, result: &result) {
-            printBoard()
-            if checkWinner(row: result.row, column: result.column, player: currentPlayer == .player1 ? 1 : -1) {
-                winner = currentPlayer
-            }
-            self.currentPlayer = self.currentPlayer == .player1 ? .player2 : .player1
-        }
-    }
-    var horizontalCounter = 0
-    var verticalCounter = 0
-    var diagonalCounter = 0
-    var reverseDiagonalCounter = 0
-    
-    func checkWinner(row: Int, column: Int, player: Int) -> Bool {
-        let leftEdge = max(column - 3, 0)
-        let rightEdge = min(column + 3, 6)
-        let topEdge = max(row - 3, 0)
-        let bottomEdge = min(row + 3, 5)
-        
-        var horizontalCounter = 0
-        for i in leftEdge...rightEdge {
-            if boardModel.board[row][i] == player {
-                horizontalCounter += 1
-                if horizontalCounter == 4 {
-                    return true
-                }
-            } else {
-                horizontalCounter = 0
-            }
-        }
-        
-        var verticalCounter = 0
-        for i in topEdge...bottomEdge {
-            if boardModel.board[i][column] == player {
-                verticalCounter += 1
-                if verticalCounter == 4 {
-                    return true
-                }
-            } else {
-                verticalCounter = 0
-            }
-        }
-        
-        let rows = boardModel.board.count        // 6
-        let cols = boardModel.board[0].count     // 7
-        
-        // ↘️ check (top-left → bottom-right)
-        for r in 0..<(rows - 3) {
-            for c in 0..<(cols - 3) {
-                let mark = boardModel.board[r][c]
-                if mark != 0 &&
-                    mark == boardModel.board[r + 1][c + 1] &&
-                    mark == boardModel.board[r + 2][c + 2] &&
-                    mark == boardModel.board[r + 3][c + 3] {
-                    return true
-                }
-            }
-        }
-        // ↗️ check (bottom-left → top-right)
-        for r in 3..<rows {
-                for c in 0..<(cols - 3) {
-                    let mark = boardModel.board[r][c]
-                    if mark != 0 &&
-                        mark == boardModel.board[r - 1][c + 1] &&
-                        mark == boardModel.board[r - 2][c + 2] &&
-                        mark == boardModel.board[r - 3][c + 3] {
-                        return true
-                    }
-                }
-            }
-        
-        return false
-    }
-    
-    func resetGame() {
-        boardModel.reset()
-        printBoard()
-        isWinner = false
-    }
-    
-    func printBoard() {
-        var result = ""
-        for row in boardModel.board {
-            for column in row {
-                result.append("\(column)\t\t")
-            }
-            result.append("\n")
-        }
-        boardVisualRepresentation = result
-    }
-}
-
-struct BoardModel {
-    var board: [[Int]] = []
-    
-    init() {
-        reset()
-    }
-    
-    mutating func reset() {
-        let column: [Int] = Array(repeating: 0, count: 7)
-        self.board = Array(repeating: column, count: 6)
-    }
-    
-    mutating func dropPiece(column: Int, mark: Int, result: inout (row: Int, column: Int)) -> Bool {
-        guard column < 7 && column >= 0 else { return false }
-        
-        for row in (0..<board.count).reversed() {
-            if board[row][column] == 0 {
-                board[row][column] = mark
-                result = (row, column)
-                return true
-            }
-        }
-        return false
-    }
-    
 }
