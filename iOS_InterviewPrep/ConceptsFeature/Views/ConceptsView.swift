@@ -28,7 +28,7 @@ struct ConceptsView: View {
                 case .metMuseum:
                     MetObjectsView(objectsViewModel: ObjectsViewModel(networkService: MetNetworkService()))
                 case .musicCatalog:
-                    MusicCatalogView(viewModel: MusicCatalogViewModel())
+                    MusicCatalogView(viewModel: MusicCatalogViewModel(musicCatalogService: ITunesCatalogService()))
                 default:
                     Text("Empty")
                 }
