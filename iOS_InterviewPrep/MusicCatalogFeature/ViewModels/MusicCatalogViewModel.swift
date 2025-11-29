@@ -14,30 +14,14 @@ class MusicCatalogViewModel {
     }
     
     func searchMusic() async {
+        errorMessage = ""
         defer { isLoading = false }
         isLoading = true
+        
         do {
             items = try await musicCatalogService.search(term: searchText)
-        } catch (let error as MusicCatalogServiceError) {
-            switch error {
-            case .invalidSearchTerm:
-                errorMessage = "Please enter a valid search term."
-            case .noDataReturned:
-                errorMessage = "No data returned for the given search term."
-            case .noResponse:
-                errorMessage = "No response from the server."
-            case .invalidURL:
-                errorMessage = "The URL is invalid."
-            }
-        } catch (let error as DecodingError) {
-            switch error {
-            case .dataCorrupted:
-                errorMessage = "Data is corrupted."
-            @unknown default:
-                errorMessage = "Failed to decode the response."
-            }
         } catch {
-            errorMessage = "Unknown error"
+            errorMessage = "Failure to fetch music. Please try again."
         }
     }
 }

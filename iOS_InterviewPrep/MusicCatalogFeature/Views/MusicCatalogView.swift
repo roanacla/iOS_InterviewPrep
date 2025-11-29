@@ -15,13 +15,16 @@ struct MusicCatalogView: View {
         }
         .navigationTitle("Music Catalog")
         .searchable(text: $viewModel.searchText)
-        .onSubmit(of: .search) {
-            Task {
-                await viewModel.searchMusic()
+        .task(id: viewModel.searchText) {
+            if viewModel.searchText.isEmpty {
+                viewModel.items = []
+                return
             }
-        }
-        .task {
-            await viewModel.searchMusic()
+            
+            do {
+                try await Task.sleep(for: .seconds(0.8))
+                await viewModel.searchMusic()
+            } catch { }
         }
     }
 }
