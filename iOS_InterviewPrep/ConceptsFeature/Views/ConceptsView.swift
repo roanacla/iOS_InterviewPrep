@@ -20,18 +20,7 @@ struct ConceptsView: View {
             }
             .navigationTitle("Concepts")
             .navigationDestination(for: Concept.self) { concept in
-                switch concept.subject {
-                case .conectedFour:
-                    ConectedFourView()
-                case .searchMovies:
-                    MovieSearchView(viewModel: SearchViewModel())
-                case .metMuseum:
-                    MetObjectsView(objectsViewModel: ObjectsViewModel(networkService: MetNetworkService()))
-                case .musicCatalog:
-                    MusicCatalogView(viewModel: MusicCatalogViewModel(musicCatalogService: ITunesCatalogService()))
-                default:
-                    Text("Empty")
-                }
+                FeatureViewFactory.view(for: concept)
             }
         }
     }

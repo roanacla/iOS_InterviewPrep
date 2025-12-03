@@ -4,13 +4,21 @@ struct MusicCatalogView: View {
     @Bindable var viewModel: MusicCatalogViewModel
     
     var body: some View {
-        ZStack {
-            if viewModel.isLoading {
-                ProgressView()
-            } else {
-                List(viewModel.items) { item in
+        List(viewModel.items) { item in
+            HStack {
+                VStack(alignment: .leading) {
                     Text(item.title)
+                        .font(.headline)
+                    Text(item.artist)
+                        .font(.subheadline)
                 }
+                Spacer()
+                //track image should go here
+            }
+        }
+        .overlay {
+            if viewModel.items.isEmpty {
+                ProgressView()
             }
         }
         .navigationTitle("Music Catalog")
