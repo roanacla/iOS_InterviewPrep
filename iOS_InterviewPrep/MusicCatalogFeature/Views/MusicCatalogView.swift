@@ -17,7 +17,7 @@ struct MusicCatalogView: View {
             }
         }
         .overlay {
-            if viewModel.items.isEmpty {
+            if viewModel.isLoading || viewModel.items.isEmpty {
                 ProgressView()
             }
         }

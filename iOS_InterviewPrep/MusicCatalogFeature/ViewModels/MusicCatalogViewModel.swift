@@ -15,6 +15,7 @@ class MusicCatalogViewModel {
     private let musicCatalogService: MusicCatalogServiceProtocol
     var searchText: String = "Taylor Swift"
     var items: [CatalogItem] = []
+    var isLoading = false
     var presentedError: MusicCatalogViewModelError?
     
     init(musicCatalogService: MusicCatalogServiceProtocol) {
@@ -22,6 +23,9 @@ class MusicCatalogViewModel {
     }
     
     func searchMusic() async {
+        defer { isLoading = false }
+        isLoading = true
+        
         do {
             items = try await musicCatalogService.search(term: searchText)
         } catch {
