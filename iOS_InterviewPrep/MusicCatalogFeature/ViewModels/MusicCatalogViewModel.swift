@@ -1,5 +1,14 @@
 import SwiftUI
 
+enum MusicCatalogViewModelError: String, Identifiable, Error {
+    case networkIssue = "Network issue. Please try again."
+    case dataCorrupted = "Data corrupted. Please try again."
+    
+    var id: String {
+        rawValue
+    }
+}
+
 @MainActor
 @Observable
 class MusicCatalogViewModel {
@@ -7,21 +16,20 @@ class MusicCatalogViewModel {
     var searchText: String = "Taylor Swift"
     var items: [CatalogItem] = []
     var isLoading = false
-    var errorMessage = ""
+    var presentedError: MusicCatalogViewModelError?
     
     init(musicCatalogService: MusicCatalogServiceProtocol) {
         self.musicCatalogService = musicCatalogService
     }
     
     func searchMusic() async {
-        errorMessage = ""
         defer { isLoading = false }
         isLoading = true
         
         do {
             items = try await musicCatalogService.search(term: searchText)
         } catch {
-            errorMessage = "Failure to fetch music. Please try again."
+            presentedError = .networkIssue
         }
     }
 }

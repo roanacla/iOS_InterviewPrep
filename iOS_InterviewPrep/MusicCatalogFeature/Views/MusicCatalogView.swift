@@ -22,9 +22,21 @@ struct MusicCatalogView: View {
             }
             
             do {
-                try await Task.sleep(for: .seconds(0.8))
+                try await Task.sleep(for: .seconds(0.5))
                 await viewModel.searchMusic()
             } catch { }
+        }
+        .alert(
+            "Error",
+            isPresented: .init(
+                get: { viewModel.presentedError != nil },
+                set: { if !$0 { viewModel.presentedError = nil } }
+            ),
+            presenting: viewModel.presentedError
+        ) { _ in
+            Button("OK") {}
+        } message: { error in
+            Text(error.rawValue)
         }
     }
 }
