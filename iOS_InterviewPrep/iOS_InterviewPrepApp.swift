@@ -23,10 +23,27 @@ struct iOS_InterviewPrepApp: App {
         }
     }()
 
+    init() {
+        registerDependencies()
+    }
+
     var body: some Scene {
         WindowGroup {
             ConceptsView(viewModel: .init())
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private func registerDependencies() {
+        // Register the concrete ITunesCatalogService for the MusicCatalogServiceProtocol.
+        let musicService: MusicCatalogServiceProtocol = ITunesCatalogService()
+        DependencyContainer.shared.register(MusicCatalogServiceProtocol.self, object: musicService)
+
+        // Register the concrete MetNetworkService for its protocol.
+        // NOTE: I'm assuming the protocol is named MetNetworkServiceProtocol. Please adjust if it's different.
+        let metService = MetNetworkService() // Assuming a protocol exists for this.
+        DependencyContainer.shared.register(MetNetworkService.self, object: metService)
+        
+        // ... register other services here
     }
 }
