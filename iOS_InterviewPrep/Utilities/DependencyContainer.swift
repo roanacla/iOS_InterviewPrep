@@ -4,7 +4,7 @@ class DependencyContainer {
     static let shared = DependencyContainer()
     
     private var singletonDictionary: [String: Any] = [:]
-    private var factoryDictionary: [String: () -> Any] = [:]
+    private var factoryDictionary: [String: Any] = [:]
     
     private init() {}
     
