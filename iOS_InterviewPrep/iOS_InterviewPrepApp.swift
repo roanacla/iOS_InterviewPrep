@@ -39,6 +39,9 @@ struct iOS_InterviewPrepApp: App {
         let musicService: MusicCatalogServiceProtocol = ITunesCatalogService()
         DependencyContainer.shared.register(MusicCatalogServiceProtocol.self, object: musicService)
 
+        let musicCatalogViewModel = MusicCatalogViewModel(musicCatalogService: musicService)
+        DependencyContainer.shared.register(MusicCatalogViewModel.self, object: musicCatalogViewModel)
+        
         // Register the concrete MetNetworkService for its protocol.
         // NOTE: I'm assuming the protocol is named MetNetworkServiceProtocol. Please adjust if it's different.
         let metService = MetNetworkService() // Assuming a protocol exists for this.

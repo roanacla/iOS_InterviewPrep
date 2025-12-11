@@ -13,9 +13,8 @@ struct FeatureViewFactory {
             let metService = DependencyContainer.shared.resolve(MetNetworkService.self)
             MetObjectsView(objectsViewModel: ObjectsViewModel(networkService: metService))
         case .musicCatalog:
-            // Resolve the MusicCatalogServiceProtocol from the container.
-            let musicService = DependencyContainer.shared.resolve(MusicCatalogServiceProtocol.self)
-            MusicCatalogView(viewModel: MusicCatalogViewModel(musicCatalogService: musicService))
+            let musicCatalogViewModel = DependencyContainer.shared.resolve(MusicCatalogViewModel.self)
+            MusicCatalogView(viewModel: musicCatalogViewModel)
         default:
             Text("Empty")
         }
